@@ -2,7 +2,7 @@
 
 ### Description
 ASRdys is a Kaldi recipe to build an ASR for speakers with dysarthria. The recipe works on the Torgo database [1] so you need to obtain this data first and include its location into the path.sh file.
-Several models are used in the pipeline implemented in run.sh.
+Several models are used in the pipeline implemented in run.sh/runMultipleSubtests.sh.
 
 ### Usage
 
@@ -16,9 +16,16 @@ To train several models on 15 different configurations taking a different test s
 ```sh
   bash ./runAllTests.sh
 ```
+
+To train several models and see the results in different partions of the test set define those partitions with torgo_data_prep_multiple_tests.sh (if different to the current ones), initialise the *tests* variable in runMultipleSubtests.sh and do as before:
+```sh
+  bash ./runMultipleSubtests.sh <test_speaker>
+```
+
 Remember to adapt path.sh to your necessities.
 
 #### TODO
+Fix the database!  
 Update the Deep Learning scripts  
 Add a RESULTS file
 
