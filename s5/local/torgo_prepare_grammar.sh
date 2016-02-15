@@ -6,6 +6,8 @@
 
 source ./path.sh
 
+subset=$1
+
 lmdir=data/local/
 tmpdir=data/local/lm_tmp
 lexicon=data/local/dict/lexicon.txt
@@ -17,7 +19,7 @@ echo ""
 echo "=== Preparing the grammar transducer (G.fst) for testing ..."
 echo ""
 
-test=data/lang_test
+test=data/lang_$subset
 mkdir -p $test
 for f in phones.txt words.txt phones.txt L.fst L_disambig.fst phones; do
     cp -r data/lang/$f $test

@@ -8,6 +8,9 @@
 . cmd.sh
 mfccdir=mfcc
 
+# Subtests to be decoded
+tests=("test" "test_head" "test_head_single" "test_head_sentence")
+
 stage=1
 
 . cmd.sh
@@ -16,12 +19,19 @@ stage=1
 
 
 if [ $stage -le 1 ]; then
-  for datadir in train test; do
+  for datadir in "${tests[@]}"; do
     utils/copy_data_dir.sh data/$datadir data/${datadir}_hires
-    steps/make_mfcc.sh --nj 14 --mfcc-config conf/mfcc_hires.conf \
+    steps/make_mfcc.sh --nj 1 --mfcc-config conf/mfcc_hires.conf \
       --cmd "$train_cmd" data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
     steps/compute_cmvn_stats.sh data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
   done
+
+  datadir=train
+  utils/copy_data_dir.sh data/$datadir data/${datadir}_hires
+  local/make_mfcc.sh --nj 14 --mfcc-config conf/mfcc_hires.conf \
+    --cmd "$train_cmd" data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
+  steps/compute_cmvn_stats.sh data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
+
   # 6175 is the end of FC03
   # Not enough data for this?
   #utils/subset_data_dir.sh --first data/train 6175 data/train_small || exit 1
@@ -83,9 +93,12 @@ fi
 
 if [ $stage -le 7 ]; then
   rm exp/nnet3/.error 2>/dev/null
-  # too small to split ($nj=1)  
-  steps/online/nnet2/extract_ivectors_online.sh --cmd "$train_cmd" --nj 1 \
-    data/test_hires exp/nnet3/extractor exp/nnet3/ivectors_test || touch exp/nnet3/.error &
+  # too small to split ($nj=1) 
+  hires="_hires" 
+  for x in "${tests[@]}"; do
+    steps/online/nnet2/extract_ivectors_online.sh --cmd "$train_cmd" --nj 1 \
+      data/$x$hires exp/nnet3/extractor exp/nnet3/ivectors_$x || touch exp/nnet3/.error &
+  done
   wait
   [ -f exp/nnet3/.error ] && echo "$0: error extracting iVectors." && exit 1;
 fi

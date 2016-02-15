@@ -21,12 +21,15 @@ dev_original=data/test
 train_original=data/train
 gmm=exp/tri3b
 stage=0
-nj=10
+nj=14
 # End of config.
 
 . utils/parse_options.sh
 
 set -euxo pipefail
+
+:<<EOF
+
 
 echo "Make FBANK features"
 # Make the FBANK features,
@@ -38,13 +41,13 @@ echo "Make FBANK features"
   steps/compute_cmvn_stats.sh $dev $dev/log $dev/data || exit 1;
   # Training set
   utils/copy_data_dir.sh $train_original $train || exit 1; rm $train/{cmvn,feats}.scp
-  steps/make_fbank_pitch.sh --nj $nj --cmd "$train_cmd" \
+  steps/make_fbank_pitch.sh --nj 14 --cmd "$train_cmd" \
      $train $train/log $train/data || exit 1;
   steps/compute_cmvn_stats.sh $train $train/log $train/data || exit 1;
   # Split the training set
   utils/subset_data_dir_tr_cv.sh --cv-spk-percent 8 $train ${train}_tr90 ${train}_cv10
 fi
-
+EOF
 echo "Run the CNN pre-training"
 # Run the CNN pre-training,
 hid_layers=2
@@ -115,7 +118,7 @@ if [ $stage -le 5 ]; then
 fi
 
 
-echo "Re-train the DNN by 6 iterations of sMBR (State Minimum Bayes Risk, discriminative training)"
+echo "Re-train the CNN by 6 iterations of sMBR (State Minimum Bayes Risk, discriminative training)"
 # Sequence training using sMBR criterion, we do Stochastic-GD with per-utterance updates.
 # Note: With DNNs in RM, the optimal LMWT is 2-6. Don't be tempted to try acwt's like 0.2, 
 # the value 0.1 is better both for decoding and sMBR.

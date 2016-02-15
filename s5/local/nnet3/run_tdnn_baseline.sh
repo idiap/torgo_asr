@@ -14,6 +14,8 @@
 stage=0
 train_stage=-10
 dir=exp/nnet3/nnet_tdnn_c
+tests=("test" "test_head" "test_head_single" "test_head_sentence")
+
 . cmd.sh
 . ./path.sh
 . ./utils/parse_options.sh
@@ -50,10 +52,13 @@ if [ $stage -le 9 ]; then
   # this does offline decoding that should give the same results as the real
   # online decoding.
 
-  graph_dir=exp/tri4b/graph
+  graph_dir=exp/tri4b/graph_
+  hires=_hires
   # use already-built graphs.
-  steps/nnet3/decode.sh --nj 1 --cmd "$decode_cmd" \
-    --online-ivector-dir exp/nnet3/ivectors_test \
-    $graph_dir data/test_hires $dir/decode || exit 1;
+  for x in "${tests[@]}"; do
+    steps/nnet3/decode.sh --nj 1 --cmd "$decode_cmd" \
+      --online-ivector-dir exp/nnet3/ivectors_test \
+      $graph_dir$x data/$x$hires $dir/decode_$x || exit 1;
+  done
 fi
 

@@ -39,8 +39,7 @@ gaussians=9000
 
 [[ $# -ge 2 ]] && { echo "Unexpected arguments"; exit 1; } 
 
-
-:<<EOF
+:<<COMENT
 
 # Initial extraction and distribution of the data: data/{train,test} directories  
 ## TODO: aixo no em funciona i hauria pq es standard
@@ -66,7 +65,8 @@ utils/prepare_lang.sh --position-dependent-phones $pos_dep_phones \
 for x in "${tests[@]}"; do
   local/torgo_prepare_grammar.sh $x || exit 1
 done
-exit
+
+COMENT
 
 # Now make MFCC features.
 echo ""
@@ -74,17 +74,28 @@ echo "=== Making MFCC features ..."
 echo ""
 # mfccdir should be some place with a largish disk where you
 # want to store MFCC features.
-mfccdir=${DATA_ROOT}/${spk_test}/mfccDys
-for x in "${tests[@]}"; do 
-# steps/make_mfcc.sh --cmd "$train_cmd" --nj $njobs \
- local/torgo_make_mfcc.sh --cmd "$train_cmd" --nj 1 \
+mfccdir=${DATA_ROOT}/${spk_test}/mfcc
+for x in "${tests[@]}"; do
+ steps/make_mfcc.sh --cmd "$train_cmd" --nj 1 \
    data/$x exp/make_mfcc/$x $mfccdir || exit 1;
  steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x $mfccdir || exit 1;
 done
-
- local/torgo_make_mfcc.sh --cmd "$train_cmd" --nj 14 \
+ steps/make_mfcc.sh --cmd "$train_cmd" --nj 14 \
    data/train exp/make_mfcc/train $mfccdir || exit 1;
  steps/compute_cmvn_stats.sh data/train exp/make_mfcc/train $mfccdir || exit 1;
+
+
+# Change previous lines for these ones if you want to calculate 
+# features differently for speakers with dysartria and for control speakers 
+#for x in "${tests[@]}"; do 
+# local/torgo_make_mfcc.sh --cmd "$train_cmd" --nj 1 \
+#   data/$x exp/make_mfcc/$x $mfccdir || exit 1;
+# steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x $mfccdir || exit 1;
+#done
+
+#local/torgo_make_mfcc.sh --cmd "$train_cmd" --nj 14 \
+#   data/train exp/make_mfcc/train $mfccdir || exit 1;
+#steps/compute_cmvn_stats.sh data/train exp/make_mfcc/train $mfccdir || exit 1;
 
 # Train monophone models on a subset of the data
 echo ""
@@ -108,7 +119,6 @@ for x in "${tests[@]}"; do
     exp/mono/graph_$x data/$x exp/mono/decode_$x
 done
 
-EOF
 
 # Get alignments from monophone system.
 steps/align_si.sh --nj $njobs --cmd "$train_cmd" \

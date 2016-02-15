@@ -141,7 +141,7 @@ for waves in ${test_sessions[@]} ; do
    spk=${tmp%/Sess*}
    mic=${waves#*wav_}
    echo "  $spk $ssn $mic"
-   gender=${spk:0:1}  #inside the just in case there were more than one test speaker  
+   gender=${spk:0:1}  #inside the for just in case there were more than one test speaker  
    gender=${gender,,}
    for doc in $session/prompts/* ; do
        line=$(cat $doc)

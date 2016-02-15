@@ -11,6 +11,7 @@ stage=0
 train_stage=-10
 affix=
 common_egs_dir=
+tests=("test" "test_head" "test_head_single" "test_head_sentence")
 
 # LSTM options
 splice_indexes="-2,-1,0,1,2 0 0"
@@ -104,16 +105,19 @@ if [ $stage -le 9 ]; then
     frames_per_chunk=$chunk_width
   fi
 
-    graph_dir=exp/tri4b/graph
+    graph_dir=exp/tri4b/graph_
     # use already-built graphs
     (
-    num_jobs=`cat data/test_hires/utt2spk|cut -d' ' -f2|sort -u|wc -l`
-    steps/nnet3/lstm/decode.sh --nj $num_jobs --cmd "$decode_cmd" \
+    hires=_hires
+    for x in "${tests[@]}"; do
+      num_jobs=`cat data/test_hires/utt2spk|cut -d' ' -f2|sort -u|wc -l`
+      steps/nnet3/lstm/decode.sh --nj $num_jobs --cmd "$decode_cmd" \
 	  --extra-left-context $extra_left_context \
 	  --extra-right-context $extra_right_context \
 	  --frames-per-chunk "$frames_per_chunk" \
-	  --online-ivector-dir exp/nnet3/ivectors_test \
-	 $graph_dir data/test_hires $dir/decode || exit 1;
+	  --online-ivector-dir exp/nnet3/ivectors_$x \
+	 $graph_dir$x data/$x$hires $dir/decode_$x || exit 1;
+    done
     ) &
 
 fi

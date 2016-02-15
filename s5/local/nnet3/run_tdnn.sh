@@ -10,9 +10,12 @@
 # If you want to run without GPU you'd have to call train_tdnn.sh with --gpu false,
 # --num-threads 16 and --minibatch-size 128.
 
+tests=("test" "test_head" "test_head_single" "test_head_sentence")
 stage=0
 train_stage=-10
 dir=exp/nnet3/nnet_tdnn_a
+
+
 . cmd.sh
 . ./path.sh
 . ./utils/parse_options.sh
@@ -47,11 +50,14 @@ fi
 if [ $stage -le 9 ]; then
   # this does offline decoding that should give the same results as the real
   # online decoding.
-    graph_dir=exp/tri4b/graph
+    graph_dir=exp/tri4b/graph_
     # use already-built graphs.
-    steps/nnet3/decode.sh --nj 1 --cmd "$decode_cmd" \
-          --online-ivector-dir exp/nnet3/ivectors_test \
-         $graph_dir data/test_hires $dir/decode || exit 1;
+    for x in "${tests[@]}"; do
+       hires=_hires
+       steps/nnet3/decode.sh --nj 1 --cmd "$decode_cmd" \
+          --online-ivector-dir exp/nnet3/ivectors_$x \
+         $graph_dir$x data/$x$hires $dir/decode_$x || exit 1;
+    done
 fi
 
 exit 0;
