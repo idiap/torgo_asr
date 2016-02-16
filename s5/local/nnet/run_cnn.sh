@@ -3,6 +3,10 @@
 # Copyright 2012-2015  Brno University of Technology (Author: Karel Vesely)
 # Apache 2.0
 
+# Cristina Espana-Bonet
+# Modified to deal with the Torgo DB and to consider different time shifts when extracting 
+# the features according to the nature of the speaker (dysartric vs. control)
+
 # This example shows how to build CNN with convolution along frequency axis.
 # First we train CNN, then build RBMs on top, then do train per-frame training 
 # and sequence-discriminative training.
@@ -28,26 +32,24 @@ nj=14
 
 set -euxo pipefail
 
-:<<EOF
-
 
 echo "Make FBANK features"
 # Make the FBANK features,
 [ ! -e $dev ] && if [ $stage -le 0 ]; then
   # Dev set
   utils/copy_data_dir.sh $dev_original $dev || exit 1; rm $dev/{cmvn,feats}.scp
-  steps/make_fbank_pitch.sh --nj $nj --cmd "$train_cmd" \
+  local/torgo_make_fbank_pitch.sh --nj 1 --cmd "$train_cmd" \
      $dev $dev/log $dev/data || exit 1;
   steps/compute_cmvn_stats.sh $dev $dev/log $dev/data || exit 1;
   # Training set
   utils/copy_data_dir.sh $train_original $train || exit 1; rm $train/{cmvn,feats}.scp
-  steps/make_fbank_pitch.sh --nj 14 --cmd "$train_cmd" \
+  local/torgo_make_fbank_pitch.sh --nj 14 --cmd "$train_cmd" \
      $train $train/log $train/data || exit 1;
   steps/compute_cmvn_stats.sh $train $train/log $train/data || exit 1;
-  # Split the training set
+  # Split the training set (8% is one speaker)
   utils/subset_data_dir_tr_cv.sh --cv-spk-percent 8 $train ${train}_tr90 ${train}_cv10
 fi
-EOF
+
 echo "Run the CNN pre-training"
 # Run the CNN pre-training,
 hid_layers=2

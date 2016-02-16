@@ -3,6 +3,7 @@
 # Copyright 2012  Johns Hopkins University (Author: Daniel Povey)
 # Cristina Espana-Bonet
 # Adapted to deal with two different time shifts (larger for dysarthric speakers)
+# In case of data with segments it must be further modified
 # Apache 2.0
 # To be run from .. (one directory up from here)
 # see ../run.sh for example
@@ -34,6 +35,9 @@ data=$1
 logdir=$2
 mfccdir=$3
 
+if [[ $mfcc_config =~ "mfcc_hires.conf" ]]; then
+   mfcc_configDys=conf/mfcc_hires_dysarthric.conf
+fi
 
 # make $mfccdir an absolute pathname.
 mfccdir=`perl -e '($dir,$pwd)= @ARGV; if($dir!~m:^/:) { $dir = "$pwd/$dir"; } print $dir; ' $mfccdir ${PWD}`

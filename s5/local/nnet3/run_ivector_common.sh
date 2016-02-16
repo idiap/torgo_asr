@@ -21,14 +21,14 @@ stage=1
 if [ $stage -le 1 ]; then
   for datadir in "${tests[@]}"; do
     utils/copy_data_dir.sh data/$datadir data/${datadir}_hires
-    steps/make_mfcc.sh --nj 1 --mfcc-config conf/mfcc_hires.conf \
+    local/torgo_make_mfcc.sh --nj 1 --mfcc-config conf/mfcc_hires.conf \
       --cmd "$train_cmd" data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
     steps/compute_cmvn_stats.sh data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
   done
 
   datadir=train
   utils/copy_data_dir.sh data/$datadir data/${datadir}_hires
-  local/make_mfcc.sh --nj 14 --mfcc-config conf/mfcc_hires.conf \
+  local/torgo_make_mfcc.sh --nj 14 --mfcc-config conf/mfcc_hires.conf \
     --cmd "$train_cmd" data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
   steps/compute_cmvn_stats.sh data/${datadir}_hires exp/make_hires/$datadir $mfccdir || exit 1;
 

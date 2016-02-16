@@ -39,7 +39,7 @@ gaussians=9000
 
 [[ $# -ge 2 ]] && { echo "Unexpected arguments"; exit 1; } 
 
-:<<COMENT
+
 
 # Initial extraction and distribution of the data: data/{train,test} directories  
 ## TODO: aixo no em funciona i hauria pq es standard
@@ -66,7 +66,6 @@ for x in "${tests[@]}"; do
   local/torgo_prepare_grammar.sh $x || exit 1
 done
 
-COMENT
 
 # Now make MFCC features.
 echo ""
@@ -75,27 +74,27 @@ echo ""
 # mfccdir should be some place with a largish disk where you
 # want to store MFCC features.
 mfccdir=${DATA_ROOT}/${spk_test}/mfcc
-for x in "${tests[@]}"; do
- steps/make_mfcc.sh --cmd "$train_cmd" --nj 1 \
-   data/$x exp/make_mfcc/$x $mfccdir || exit 1;
- steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x $mfccdir || exit 1;
-done
- steps/make_mfcc.sh --cmd "$train_cmd" --nj 14 \
-   data/train exp/make_mfcc/train $mfccdir || exit 1;
- steps/compute_cmvn_stats.sh data/train exp/make_mfcc/train $mfccdir || exit 1;
+#for x in "${tests[@]}"; do
+# steps/make_mfcc.sh --cmd "$train_cmd" --nj 1 \
+#   data/$x exp/make_mfcc/$x $mfccdir || exit 1;
+# steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x $mfccdir || exit 1;
+#done
+# steps/make_mfcc.sh --cmd "$train_cmd" --nj 14 \
+#   data/train exp/make_mfcc/train $mfccdir || exit 1;
+# steps/compute_cmvn_stats.sh data/train exp/make_mfcc/train $mfccdir || exit 1;
 
 
 # Change previous lines for these ones if you want to calculate 
 # features differently for speakers with dysartria and for control speakers 
-#for x in "${tests[@]}"; do 
-# local/torgo_make_mfcc.sh --cmd "$train_cmd" --nj 1 \
-#   data/$x exp/make_mfcc/$x $mfccdir || exit 1;
-# steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x $mfccdir || exit 1;
-#done
+for x in "${tests[@]}"; do 
+ local/torgo_make_mfcc.sh --cmd "$train_cmd" --nj 1 \
+   data/$x exp/make_mfcc/$x $mfccdir || exit 1;
+ steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x $mfccdir || exit 1;
+done
 
-#local/torgo_make_mfcc.sh --cmd "$train_cmd" --nj 14 \
-#   data/train exp/make_mfcc/train $mfccdir || exit 1;
-#steps/compute_cmvn_stats.sh data/train exp/make_mfcc/train $mfccdir || exit 1;
+local/torgo_make_mfcc.sh --cmd "$train_cmd" --nj 14 \
+   data/train exp/make_mfcc/train $mfccdir || exit 1;
+steps/compute_cmvn_stats.sh data/train exp/make_mfcc/train $mfccdir || exit 1;
 
 # Train monophone models on a subset of the data
 echo ""
