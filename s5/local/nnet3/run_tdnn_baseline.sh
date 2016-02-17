@@ -43,9 +43,11 @@ if [ $stage -le 8 ]; then
     --cmd "$decode_cmd" \
     --pnorm-input-dim 2000 \
     --pnorm-output-dim 250 \
+    --egs-opts "--nj 1" \
     data/train_hires data/lang exp/tri4b_ali $dir  || exit 1;
 fi
-#    --io-opts "--max-jobs-run 12" \
+   #--cmvn_opts "--nj 4" \
+ #    --io-opts "--max-jobs-run 12" \
 
 
 if [ $stage -le 9 ]; then

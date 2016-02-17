@@ -11,7 +11,6 @@ stage=0
 train_stage=-10
 affix=
 common_egs_dir=
-tests=("test" "test_head" "test_head_single" "test_head_sentence")
 
 # LSTM options
 splice_indexes="-2,-1,0,1,2 0 0"
@@ -32,7 +31,7 @@ num_epochs=10
 initial_effective_lrate=0.0006
 final_effective_lrate=0.00006
 num_jobs_initial=2
-num_jobs_final=12
+num_jobs_final=6
 momentum=0.5
 num_chunk_per_minibatch=100
 samples_per_iter=20000
@@ -91,6 +90,7 @@ if [ $stage -le 8 ]; then
     --chunk-right-context $chunk_right_context \
     --egs-dir "$common_egs_dir" \
     --remove-egs $remove_egs \
+    --egs-opts "--nj 1" \
     data/train_hires data/lang exp/tri4b_ali $dir  || exit 1;
 fi
 
@@ -110,7 +110,7 @@ if [ $stage -le 9 ]; then
     (
     hires=_hires
     for x in "${tests[@]}"; do
-      num_jobs=`cat data/test_hires/utt2spk|cut -d' ' -f2|sort -u|wc -l`
+      num_jobs=`cat data/${x}_hires/utt2spk|cut -d' ' -f2|sort -u|wc -l`
       steps/nnet3/lstm/decode.sh --nj $num_jobs --cmd "$decode_cmd" \
 	  --extra-left-context $extra_left_context \
 	  --extra-right-context $extra_right_context \
@@ -119,8 +119,6 @@ if [ $stage -le 9 ]; then
 	 $graph_dir$x data/$x$hires $dir/decode_$x || exit 1;
     done
     ) &
-
 fi
 
 exit 0;
-

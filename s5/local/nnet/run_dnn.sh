@@ -74,7 +74,7 @@ if [ $stage -le 2 ]; then
     $data_fmllr/train_tr90 $data_fmllr/train_cv10 data/lang $ali $ali $dir
   # Decode (reuse HCLG graph)
   steps/nnet/decode.sh --nj $nj --cmd "$decode_cmd" --config conf/decode_dnn.config --acwt 0.1 \
-    $gmm/graph $data_fmllr/test $dir/decode
+    $gmm/graph_test $data_fmllr/test $dir/decode #cris graph_test
 fi
 
 
@@ -102,7 +102,7 @@ if [ $stage -le 4 ]; then
   for ITER in 6 3 1; do
     steps/nnet/decode.sh --nj $nj --cmd "$decode_cmd" --config conf/decode_dnn.config \
       --nnet $dir/${ITER}.nnet --acwt $acwt \
-      $gmm/graph $data_fmllr/test $dir/decode_it${ITER}
+      $gmm/graph_test $data_fmllr/test $dir/decode_it${ITER} #cris graph_test
   done 
 fi
 

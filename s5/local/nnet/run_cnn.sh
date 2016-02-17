@@ -50,6 +50,7 @@ echo "Make FBANK features"
   utils/subset_data_dir_tr_cv.sh --cv-spk-percent 8 $train ${train}_tr90 ${train}_cv10
 fi
 
+
 echo "Run the CNN pre-training"
 # Run the CNN pre-training,
 hid_layers=2
@@ -64,9 +65,10 @@ if [ $stage -le 1 ]; then
       --network-type cnn1d --cnn-proto-opts "--patch-dim1 8 --pitch-dim 3" \
       --hid-layers $hid_layers --learn-rate 0.008 \
       ${train}_tr90 ${train}_cv10 data/lang $ali $ali $dir || exit 1;
+
   # Decode,
-  steps/nnet/decode.sh --nj $nj --cmd "$decode_cmd" --config conf/decode_dnn.config --acwt 0.1 \
-    $gmm/graph $dev $dir/decode || exit 1;
+  steps/nnet/decode.sh --nj 1 --cmd "$decode_cmd" --config conf/decode_dnn.config --acwt 0.1 \
+    $gmm/graph_test $dev $dir/decode || exit 1;
 fi
 
 if [ $stage -le 2 ]; then
@@ -116,7 +118,7 @@ if [ $stage -le 5 ]; then
     ${train}_tr90 ${train}_cv10 data/lang $ali $ali $dir || exit 1;
   # Decode (reuse HCLG graph)
   steps/nnet/decode.sh --nj $nj --cmd "$decode_cmd" --config conf/decode_dnn.config --acwt 0.1 \
-    $gmm/graph $dev $dir/decode || exit 1;
+    $gmm/graph_test $dev $dir/decode || exit 1;
 fi
 
 
@@ -145,7 +147,7 @@ if [ $stage -le 7 ]; then
   for ITER in 1 3 6; do
     steps/nnet/decode.sh --nj $nj --cmd "$decode_cmd" --config conf/decode_dnn.config \
       --nnet $dir/${ITER}.nnet --acwt $acwt \
-      $gmm/graph $dev $dir/decode_it${ITER} || exit 1
+      $gmm/graph_test $dev $dir/decode_it${ITER} || exit 1
   done 
 fi
 

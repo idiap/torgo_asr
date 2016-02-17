@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Cristina Espana-Bonet
+# Modified to deal with the Torgo DB and to consider different time shifts when extracting 
+# the features according to the nature of the speaker (dysartric vs. control)
+
 # this script is called from scripts like run_ms.sh; it does the common stages
 # of the build, such as feature extraction.
 # This is actually the same as local/online/run_nnet2_common.sh, except
