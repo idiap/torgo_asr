@@ -13,7 +13,7 @@
 
 stage=0
 train_stage=-10
-dir=exp/nnet3/nnet_tdnn_c
+dir=exp/nnet3/nnet_tdnn_c_noIvec
 tests=("test" "test_head" "test_head_single" "test_head_sentence")
 
 . cmd.sh
@@ -29,15 +29,14 @@ where "nvcc" is installed.
 EOF
 fi
 
-local/nnet3/run_ivector_common.sh --stage $stage || exit 1;
+local/nnet3/run_common.sh --stage $stage || exit 1;
 
-if [ $stage -le 8 ]; then
+if [ $stage -le 3 ]; then
 
   steps/nnet3/train_tdnn.sh --stage $train_stage \
     --num-epochs 8 --num-jobs-initial 2 --num-jobs-final 14 \
     --splice-indexes "-1,0,1  -2,1  -4,2 0" \
     --feat-type raw \
-    --online-ivector-dir exp/nnet3/ivectors_train \
     --cmvn-opts "--norm-means=false --norm-vars=false" \
     --initial-effective-lrate 0.005 --final-effective-lrate 0.0005 \
     --cmd "$decode_cmd" \
@@ -50,7 +49,7 @@ fi
  #    --io-opts "--max-jobs-run 12" \
 
 
-if [ $stage -le 9 ]; then
+if [ $stage -le 4 ]; then
   # this does offline decoding that should give the same results as the real
   # online decoding.
 
@@ -59,7 +58,6 @@ if [ $stage -le 9 ]; then
   # use already-built graphs.
   for x in "${tests[@]}"; do
     steps/nnet3/decode.sh --nj 1 --cmd "$decode_cmd" \
-      --online-ivector-dir exp/nnet3/ivectors_test \
       $graph_dir$x data/$x$hires $dir/decode_$x || exit 1;
   done
 fi

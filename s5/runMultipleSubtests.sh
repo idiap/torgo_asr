@@ -328,35 +328,46 @@ echo "--- nnet: Deep Neural Network (dnn)"
 #local/nnet/run_dnn.sh --nj $njobsT &
 
 echo ""
-#echo "--- nnet: Convolutional Neural Network"
-# Karel's CNN recipe. NOT CHECKED
+echo "--- nnet: Convolutional Neural Network (cnn)"
+# Karel's CNN recipe. 
 #local/nnet/run_cnn.sh --nj $njobsT
 
-echo ""
+#echo ""
 #echo "--- nnet: Convolutional Neural Network"
 # Karel's 2D-CNN recipe (from Harish). NOT CHECKED 
 # local/nnet/run_cnn2d.sh --nj $njobsT
 
-
-echo ""
+#echo ""
 #echo "--- nnet: Autoencoder" 
 # NOT WORKING
 #local/nnet/run_autoencoder.sh
 
 echo ""
-#echo "--- nnet2: Deep Neural Network"
-# if you want at this point you can train and test NN model(s)
-#local/nnet2/run_5a_clean_100.sh || exit 1
+echo "--- nnet3: Deep Neural Network baseline without i-vectors"
+# local/nnet3/run_tdnn_baseline_noIvec.sh 
 
-
-# # A couple of nnet3 recipes:
 echo ""
-# local/nnet3/run_tdnn_baseline.sh  # designed for exact comparison with nnet2 recipe
-echo "--- nnet3: Time Delay Neural Network (tdnn)" 
-#local/nnet3/run_tdnn.sh  # better absolute results
+echo "--- nnet3: Deep Neural Network baseline with i-vectors"
+# local/nnet3/run_tdnn_baseline_ivec.sh  # designed for exact comparison with nnet2 recipe
+
+echo ""
+echo "--- nnet3: Time Delay Neural Network (tdnn) without i-vectors " 
+#local/nnet3/run_tdnn_noIvec.sh  # better absolute results
+
+echo ""
+echo "--- nnet3: Time Delay Neural Network (tdnn) with i-vectors " 
+#local/nnet3/run_tdnn_ivec.sh  # better absolute results
+
+echo ""
+echo "--- nnet3: Long Short Time Memory (lstm) without i-vectors " 
+# local/nnet3/run_lstm_noIvec.sh  # lstm recipe
+
+echo ""
+echo "--- nnet3: Long Short Time Memory (lstm) with i-vectors " 
+# local/nnet3/run_lstm_ivec.sh  # lstm recipe
 
 
-# local/nnet3/run_lstm.sh  # lstm recipe
+# local/nnet3/run_lstm_noIvec.sh  # lstm recipe
 # bidirectional lstm recipe
 # local/nnet3/run_lstm.sh --affix bidirectional \
 #                  --lstm-delay " [-1,1] [-2,2] [-3,3] " \
@@ -371,5 +382,6 @@ echo "--- nnet3: Time Delay Neural Network (tdnn)"
 echo "Print best results summary"
 echo "--- WER scores"
 for x in exp/*/decode*; do [ -d $x ] && [[ $x =~ "$1" ]] && grep WER $x/wer_* | utils/best_wer.sh; done
+for x in exp/*/nn*/decode*; do [ -d $x ] && [[ $x =~ "$1" ]] && grep WER $x/wer_* | utils/best_wer.sh; done
 
 

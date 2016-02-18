@@ -59,7 +59,7 @@ where "nvcc" is installed.
 EOF
 fi
 
-dir=exp/nnet3/lstm
+dir=exp/nnet3/lstm_ivec
 dir=$dir${affix:+_$affix}
 if [ $label_delay -gt 0 ]; then dir=${dir}_ld$label_delay; fi
 
@@ -108,6 +108,13 @@ if [ $stage -le 9 ]; then
     graph_dir=exp/tri4b/graph_
     # use already-built graphs
     (
+      steps/nnet3/lstm/decode.sh --nj 1 --cmd "$decode_cmd" \
+	  --extra-left-context $extra_left_context \
+	  --extra-right-context $extra_right_context \
+	  --frames-per-chunk "$frames_per_chunk" \
+	  --online-ivector-dir exp/nnet3/ivectors_test \
+	 exp/tri4b/graph_test data/test_hires $dir/decode_test || exit 1;
+
     hires=_hires
     for x in "${tests[@]}"; do
       num_jobs=`cat data/${x}_hires/utt2spk|cut -d' ' -f2|sort -u|wc -l`
