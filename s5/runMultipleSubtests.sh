@@ -40,6 +40,7 @@ gaussians=9000
 [[ $# -ge 2 ]] && { echo "Unexpected arguments"; exit 1; } 
 
 
+:<<DONE
 
 # Initial extraction and distribution of the data: data/{train,test} directories  
 ## TODO: aixo no em funciona i hauria pq es standard
@@ -319,16 +320,16 @@ echo ""
 echo "--- SGMM"
 # Subspace Gaussian Mixture Models (SGMMs)
 local/run_sgmm2.sh --nj $njobsT
-
+DONE
 
 echo ""
 echo "=== Neural Network models ..."
-echo "--- nnet: Deep Neural Network (dnn)"
+#echo "--- nnet: Deep Neural Network (dnn)"
 # Karel's neural net recipe.
 #local/nnet/run_dnn.sh --nj $njobsT &
 
-echo ""
-echo "--- nnet: Convolutional Neural Network (cnn)"
+#echo ""
+#echo "--- nnet: Convolutional Neural Network (cnn)"
 # Karel's CNN recipe. 
 #local/nnet/run_cnn.sh --nj $njobsT
 
@@ -342,41 +343,40 @@ echo "--- nnet: Convolutional Neural Network (cnn)"
 # NOT WORKING
 #local/nnet/run_autoencoder.sh
 
-echo ""
-echo "--- nnet3: Deep Neural Network baseline without i-vectors"
+#echo ""
+#echo "--- nnet3: Deep Neural Network baseline without i-vectors"
 # local/nnet3/run_tdnn_baseline_noIvec.sh 
 
-echo ""
-echo "--- nnet3: Deep Neural Network baseline with i-vectors"
+#echo ""
+#echo "--- nnet3: Deep Neural Network baseline with i-vectors"
 # local/nnet3/run_tdnn_baseline_ivec.sh  # designed for exact comparison with nnet2 recipe
 
-echo ""
-echo "--- nnet3: Time Delay Neural Network (tdnn) without i-vectors " 
-#local/nnet3/run_tdnn_noIvec.sh  # better absolute results
+#echo ""
+#echo "--- nnet3: Time Delay Neural Network (tdnn) without i-vectors " 
+#local/nnet3/run_tdnn_noIvec.sh --stage 3  # better absolute results
+
+#echo ""
+#echo "--- nnet3: Time Delay Neural Network (tdnn) with i-vectors " 
+#local/nnet3/run_tdnn_ivec.sh --stage 8 # better absolute results
+
+#echo ""
+#echo "--- nnet3: Long Short Time Memory (lstm) without i-vectors " 
+# local/nnet3/run_lstm_noIvec.sh  --stage 3 # lstm recipe
 
 echo ""
-echo "--- nnet3: Time Delay Neural Network (tdnn) with i-vectors " 
-#local/nnet3/run_tdnn_ivec.sh  # better absolute results
+#echo "--- nnet3: Long Short Time Memory (lstm) with i-vectors " 
+# local/nnet3/run_lstm_ivec.sh --stage 8  # lstm recipe
 
 echo ""
-echo "--- nnet3: Long Short Time Memory (lstm) without i-vectors " 
-# local/nnet3/run_lstm_noIvec.sh  # lstm recipe
-
-echo ""
-echo "--- nnet3: Long Short Time Memory (lstm) with i-vectors " 
-# local/nnet3/run_lstm_ivec.sh  # lstm recipe
-
-
-# local/nnet3/run_lstm_noIvec.sh  # lstm recipe
-# bidirectional lstm recipe
-# local/nnet3/run_lstm.sh --affix bidirectional \
-#                  --lstm-delay " [-1,1] [-2,2] [-3,3] " \
-#                         --label-delay 0 \
-#                         --cell-dim 640 \
-#                         --recurrent-projection-dim 128 \
-#                         --non-recurrent-projection-dim 128 \
-#                         --chunk-left-context 40 \
-#                         --chunk-right-context 40
+echo "--- nnet3: Bidirectional Long Short Time Memory (lstm) without i-vectors "
+local/nnet3/run_lstm_noIvec.sh  --stage 3 --affix bidirectional \
+                 --lstm-delay " [-1,1] [-2,2] [-3,3] " \
+                 --label-delay 0 \
+                 --cell-dim 640 \
+                 --recurrent-projection-dim 128 \
+                 --non-recurrent-projection-dim 128 \
+                 --chunk-left-context 40 \
+                 --chunk-right-context 40
 
 # Looking at the results. Summary.
 echo "Print best results summary"
