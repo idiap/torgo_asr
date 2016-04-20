@@ -10,7 +10,7 @@ To train several models on all the speakers except one for testing do:
 ```sh
   bash ./run.sh <test_speaker>
 ```
-where <test_speaker> is one of the 15 speakers in the database.
+where \<test_speaker\> is one of the 15 speakers in the database.
 
 To train several models on 15 different configurations taking a different test speaker at a time do:
 ```sh
@@ -25,7 +25,6 @@ To train several models and see the results in different partions of the test se
 Remember to adapt path.sh to your necessities.
 
 #### TODO
-Fix the database!  
 Update the Deep Learning scripts  
 Add a RESULTS file
 
