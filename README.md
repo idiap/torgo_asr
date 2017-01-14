@@ -32,8 +32,13 @@ Add a RESULTS file
 Cristina España-Bonet  
 (especific scripts only for the Torgo database: ./local)
 
+### Citation
+Cristina España-Bonet and José A. R. Fonollosa
+*Automatic Speech Recognition with Deep Neural Networks for Impaired Speech*
+Chapter in Advances in Speech and Language Technologies for Iberian Languages, part of the series Lecture Notes in Artificial Intelligence. In A. Abad et al. (Eds.). IberSPEECH 2016, LNAI 10077, Chapter 10, pages 97-107, October 2016.
+
 ### References
-[1] Frank Rudzicz , Aravind Kumar Namasivayam and Talya Wolff.
+[1] Frank Rudzicz, Aravind Kumar Namasivayam and Talya Wolff.
 *The TORGO database of acoustic and articulatory speech from speakers with dysarthria*. 
 Language Resources and Evaluation, December 2012, Volume 46, Issue 4, pp 523-541 
 
