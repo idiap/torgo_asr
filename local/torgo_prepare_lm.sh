@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Copyright 2012 Vassil Panayotov
-# Adapted: Cristina Espana-Bonet 2016
+#           2016 Cristina Espana-Bonet
+#           2018 Idiap Research Institute (Author: Enno Hermann)
+
 # Apache 2.0
 
 . path.sh || exit 1
@@ -9,26 +11,15 @@
 echo ""
 echo "=== Building a language model ..."
 
-locdata=data/local
-loctmp=$locdata/tmp
-mkdir -p $loctmp
+if [ -f path.sh ]; then . ./path.sh; fi
+. parse_options.sh || exit 1;
 
-# Language model order
-order=3
-
-. utils/parse_options.sh
-
-# Prepare a LM training corpus from the transcripts _not_ in the test set
-cut -f2- -d' ' < data/test/text |\
-  sed -e 's:[ ]\+: :g' | sort -u > $loctmp/test_utt.txt
-
-# We are not removing the test utterances in the current version of the recipe
-# because this messes up with some of the later stages - e.g. too many OOV
-# words in tri2b_mmi
-cut -f2- -d' ' < data/train/text |\
-   sed -e 's:[ ]\+: :g' |\
-   sort -u > $loctmp/corpus.txt
-
+if [ $# -lt 0 ] || [ $# -gt 0 ]; then
+   echo "Usage: $0";
+   echo "e.g.: $0"
+   echo "options: "
+   exit 1;
+fi
 
 loc=`which ngram-count`;
 if [ -z $loc ]; then
@@ -48,6 +39,15 @@ if [ -z $loc ]; then
   fi
 fi
 
-ngram-count -order $order -write-vocab $locdata/vocab-full.txt -wbdiscount \
-  -text $loctmp/corpus.txt -lm $locdata/lm.arpa
+local=data/local_$x
+mkdir -p data/local_{single,multi}
 
+ngram-count -order 1 -write-vocab data/local_single/vocab-full.txt -wbdiscount \
+            -text data/text_uniq_single -lm data/local_single/lm.arpa
+ngram-count -order 2 -write-vocab data/local_multi/vocab-full.txt -wbdiscount \
+            -text data/text_uniq_multi -lm data/local_multi/lm.arpa
+mkdir data/local
+cat data/local_{single,multi}/vocab-full.txt | sort | uniq > data/local/vocab-full.txt
+cd data
+ln -s local_single local_single_nolimit
+cd ..

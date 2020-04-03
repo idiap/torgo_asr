@@ -1,44 +1,89 @@
 # ASRdys
 
-### Description
-ASRdys is a Kaldi recipe to build an ASR for speakers with dysarthria. The recipe works on the Torgo database [1] so you need to obtain this data first and include its location into the path.sh file.
-Several models are used in the pipeline implemented in run.sh/runMultipleSubtests.sh.
+## Description
+This is a Kaldi recipe to build automatic speech recognition systems on the
+[Torgo corpus](http://www.cs.toronto.edu/~complingweb/data/TORGO/torgo.html) of
+dysarthric speech.
 
-### Usage
+## Setup
 
-To train several models on all the speakers except one for testing do:
+Update the `KALDI_ROOT` and `DATA_ORIG` variables in `path.sh` to point to the
+correct locations for your Kaldi installation and the Torgo corpus. Then run
+the following:
+
 ```sh
-  bash ./run.sh <test_speaker>
-```
-where \<test_speaker\> is one of the 15 speakers in the database.
-
-To train several models on 15 different configurations taking a different test speaker at a time do:
-```sh
-  bash ./runAllTests.sh
-```
-
-To train several models and see the results in different partions of the test set define those partitions with torgo_data_prep_multiple_tests.sh (if different to the current ones), initialise the *tests* variable in runMultipleSubtests.sh and do as before:
-```sh
-  bash ./runMultipleSubtests.sh <test_speaker>
+source path.sh
+ln -s $KALDI_ROOT/egs/wsj/s5/{steps,utils} .
 ```
 
-Remember to adapt path.sh to your necessities.
+Some scripts in `local/` also require the following Python packages:
 
-#### TODO
-Update the Deep Learning scripts  
-Add a RESULTS file
+```
+invoke numpy pandas python-Levenshtein
+```
 
-### Authors
-Cristina España-Bonet  
-(especific scripts only for the Torgo database: ./local)
+## Usage
 
-### Citation
-Cristina España-Bonet and José A. R. Fonollosa
-*Automatic Speech Recognition with Deep Neural Networks for Impaired Speech*
-Chapter in Advances in Speech and Language Technologies for Iberian Languages, part of the series Lecture Notes in Artificial Intelligence. In A. Abad et al. (Eds.). IberSPEECH 2016, LNAI 10077, Chapter 10, pages 97-107, October 2016.
+The following instructions allow to train ASR systems on Torgo and to reproduce
+results from the paper.
 
-### References
-[1] Frank Rudzicz, Aravind Kumar Namasivayam and Talya Wolff.
-*The TORGO database of acoustic and articulatory speech from speakers with dysarthria*. 
-Language Resources and Evaluation, December 2012, Volume 46, Issue 4, pp 523-541 
+### Train ASR systems
 
+```sh
+# HMM/GMM systems:
+./run.sh
+
+# LF-MMI (TDNN-F) systems:
+./run_tdnnf.sh
+
+# CE (TDNN-LSTM) systems:
+./local/nnet3/run_tdnn_lstm.sh
+
+# Show WER:
+./local/get_wer.py exp/sgmm
+```
+
+### Corpus statistics
+
+Torgo corpus statistics:
+
+```sh
+./local/corpus_statistics.sh
+```
+
+### Pronunciation similarity
+
+How similar are the isolated words to each other? First retrieve the phonetic
+representation for each word, then analyse the similarity of pronunciations:
+
+```sh
+./local/get_prons.sh > data/pronunciations_single
+./local/compute_pron_similarity.py
+```
+
+### Phone duration
+We analysed how mean phoneme duration and WER are correlated.
+
+```sh
+# Get phone alignments with duration information:
+./local/get_phone_alignments.sh exp/sgmm
+
+# Compute mean phoneme durations:
+./local/analyze_phone_lengths.py
+```
+
+## Citation
+
+You can cite the following paper if you use this code for your research.
+
+```
+@inproceedings{hermann2020.asr,
+    author = "Hermann, Enno and Magimai.-Doss, Mathew",
+    title = "Dysarthric Speech Recognition with Lattice-Free {MMI}",
+    booktitle = "Proceedings International Conference on Acoustics, Speech, and Signal Processing (ICASSP)",
+    year = "2020",
+}
+```
+
+The code is based on [an earlier recipe](https://github.com/cristinae/ASRdys) by
+Cristina España-Bonet and José A. R. Fonollosa.

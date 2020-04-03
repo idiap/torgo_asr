@@ -6,7 +6,7 @@
 
 # begin configuration section.
 cmd=run.pl
-min_lmwt=12
+min_lmwt=1
 max_lmwt=28
 #end configuration section.
 
@@ -48,6 +48,6 @@ $cmd LMWT=$min_lmwt:$max_lmwt $dir/scoring/log/score.LMWT.log \
      ark:$dir/scoring/test_filt.txt  ark,p:- ">&" $dir/wer_LMWT || exit 1;
 
 # Show results
-for f in $dir/wer_*; do echo $f; egrep  '(WER)|(SER)' < $f; done
-
+#for f in $dir/wer_*; do echo $f; egrep  '(WER)|(SER)' < $f; done
+# grep -s WER $dir/wer_* | ./utils/best_wer.sh
 exit 0;
