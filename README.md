@@ -1,4 +1,4 @@
-# ASRdys
+# Torgo ASR
 
 ## Description
 This is a Kaldi recipe to build automatic speech recognition systems on the
