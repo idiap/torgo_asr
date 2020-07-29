@@ -74,14 +74,16 @@ We analysed how mean phoneme duration and WER are correlated.
 
 ## Citation
 
-You can cite the following paper if you use this code for your research.
+Please cite the following paper if you use this code for your research.
 
-```
+```BibTeX
 @inproceedings{hermann2020.asr,
     author = "Hermann, Enno and Magimai.-Doss, Mathew",
     title = "Dysarthric Speech Recognition with Lattice-Free {MMI}",
     booktitle = "Proceedings International Conference on Acoustics, Speech, and Signal Processing (ICASSP)",
+    pages = "6109--6113",
     year = "2020",
+    doi = "10.1109/ICASSP40776.2020.9053549"
 }
 ```
 
