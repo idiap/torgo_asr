@@ -67,7 +67,7 @@ for waves in ${train_sessions[@]} ; do
     # get the nomenclature
     session=$(dirname $waves)        
     ssn=$(basename $session)
-    tmp=${session#*/data/}
+    tmp=${session#*$CORPUS/}
     spk=${tmp%/Sess*}
     mic=${waves#*wav_}
     echo "  $spk $ssn $mic"
